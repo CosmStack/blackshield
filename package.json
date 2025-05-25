@@ -31,9 +31,14 @@
     "dev": "tsup --watch",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext .ts,.tsx",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --fix",
+    "format": "biome format --write",
+    "check": "biome check",
+    "check:fix": "biome check --fix",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepare": "husky install"
   },
   "keywords": [
     "security",
@@ -54,14 +59,17 @@
     "zod": ">=3.20.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.45",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.56.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.0",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "vitest": "^3.1.4",
@@ -69,5 +77,10 @@
   },
   "dependencies": {
     "jose": "^5.2.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
   }
 }
