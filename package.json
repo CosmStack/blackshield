@@ -1,0 +1,73 @@
+{
+  "name": "@cosmstack/blackshield",
+  "version": "0.1.0",
+  "description": "A developer-first security toolkit for React/Next.js applications",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js"
+    },
+    "./eslint": {
+      "types": "./dist/rules/index.d.ts",
+      "import": "./dist/rules/index.mjs",
+      "require": "./dist/rules/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "lint": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "security",
+    "react",
+    "nextjs",
+    "typescript",
+    "developer-tools",
+    "xss-protection",
+    "environment-variables",
+    "server-client-boundary"
+  ],
+  "author": "CosmStack",
+  "license": "MIT",
+  "type": "module",
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "react": ">=18.0.0",
+    "zod": ">=3.20.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.45",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "husky": "^9.1.7",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vitest": "^3.1.4",
+    "zod": "^3.22.4"
+  },
+  "dependencies": {
+    "jose": "^5.2.0"
+  }
+}
