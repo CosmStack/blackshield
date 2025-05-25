@@ -1,8 +1,8 @@
 'use client'
 
-// Example using @cosmstack/blackshield installed package
-// This demonstrates the main React hooks and components
-import { SafeHTML, SecureProvider, useGuardedRoute, useSecureUser } from '@cosmstack/blackshield'
+// Example using @cosmstack/blackshield - in real usage, import from the package
+// For development, we use relative imports to the source
+import { SafeHTML, SecureProvider, useGuardedRoute, useSecureUser } from '../src'
 
 // 1. Wrap your app with SecureProvider
 function App() {

@@ -1,11 +1,7 @@
-import {
-  createSignedCookie,
-  readSecureCookie,
-  validateServerInput,
-} from '@cosmstack/blackshield/server'
-// Example using @cosmstack/blackshield/server utilities
-// This demonstrates server-side validation and secure cookies in Next.js App Router
 import { z } from 'zod'
+import { createSignedCookie, readSecureCookie, validateServerInput } from '../src/server'
+// Example using @cosmstack/blackshield/server - in real usage, import from the package
+// For development, we use relative imports to the source
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -57,7 +53,7 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function getServerUser() {
-  const session = await readSecureCookie('session')
+  const session = await readSecureCookie<{ userId: string; roles: string[] }>('session')
 
   if (!session) {
     return null

@@ -83,7 +83,6 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
-    "@cosmstack/blackshield": "file:cosmstack-blackshield-0.1.0.tgz",
     "jose": "^5.2.0"
   },
   "config": {
