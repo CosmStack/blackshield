@@ -25,7 +25,7 @@ export default defineConfig([
     format: ['cjs', 'esm'],
     dts: true,
     outDir: 'dist/rules',
-    external: ['@typescript-eslint/utils'],
+    external: ['@typescript-eslint/utils', '@typescript-eslint/eslint-plugin', 'eslint'],
     treeshake: true,
   },
-]) 
+])

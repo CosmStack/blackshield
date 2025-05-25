@@ -8,36 +8,34 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.mjs",
-      "require": "./dist/server/index.js"
+      "import": "./dist/server/index.js",
+      "require": "./dist/server/index.cjs"
     },
-    "./eslint": {
+    "./eslint-plugin": {
       "types": "./dist/rules/index.d.ts",
-      "import": "./dist/rules/index.mjs",
-      "require": "./dist/rules/index.js"
+      "import": "./dist/rules/index.js",
+      "require": "./dist/rules/index.cjs"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "biome lint",
-    "lint:fix": "biome lint --fix",
+    "lint": "biome check",
+    "lint:fix": "biome check --fix",
     "format": "biome format --write",
     "check": "biome check",
     "check:fix": "biome check --fix",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
+    "release": "./scripts/release.sh",
     "prepare": "husky install"
   },
   "keywords": [
@@ -52,6 +50,14 @@
   ],
   "author": "CosmStack",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cosmstack/blackshield.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cosmstack/blackshield/issues"
+  },
+  "homepage": "https://github.com/cosmstack/blackshield#readme",
   "type": "module",
   "peerDependencies": {
     "next": ">=13.0.0",
@@ -66,6 +72,7 @@
     "@types/react": "^18.2.45",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
+    "@typescript-eslint/utils": "^6.15.0",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.56.0",
@@ -76,6 +83,7 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
+    "@cosmstack/blackshield": "file:cosmstack-blackshield-0.1.0.tgz",
     "jose": "^5.2.0"
   },
   "config": {

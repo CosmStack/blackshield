@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip') && !contains(github.event.head_commit.message, 'skip ci')"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm run typecheck
+
+      - run: npm run check
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Check if there are changes that warrant a release
+          if git diff --quiet HEAD~1 HEAD -- src/ package.json; then
+            echo "No significant changes detected, skipping release"
+            exit 0
+          fi
+          
+          # Determine version bump based on commit messages
+          if git log --format=%B -n 1 | grep -q "BREAKING CHANGE\|feat!"; then
+            npm version major
+          elif git log --format=%B -n 1 | grep -q "^feat"; then
+            npm version minor
+          elif git log --format=%B -n 1 | grep -q "^fix\|^perf"; then
+            npm version patch
+          else
+            echo "No version bump needed"
+            exit 0
+          fi
+          
+          # Push the version bump
+          git push --follow-tags
+          
+          # Create GitHub release
+          gh release create "v$(node -p "require('./package.json').version")" \
+            --title "v$(node -p "require('./package.json').version")" \
+            --notes "Auto-generated release" \
+            --latest 
