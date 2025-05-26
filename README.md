@@ -31,7 +31,7 @@ npm install @cosmstack/blackshield zod
 ### Initialize Configuration
 
 ```bash
-npx blackshield init
+npx @cosmstack/blackshield init
 ```
 
 This creates `.blackshieldrc.json` and example ESLint configuration.
@@ -58,8 +58,8 @@ export default function RootLayout({ children }) {
 ### Run Security Analysis
 
 ```bash
-npx blackshield check
-npx blackshield scan-env
+npx @cosmstack/blackshield check
+npx @cosmstack/blackshield scan-env
 ```
 
 ## 📚 Core Concepts
@@ -97,7 +97,7 @@ Blackshield provides comprehensive protection against common web vulnerabilities
 - Private configuration leaked through `NEXT_PUBLIC_*` variables
 
 **Detection Methods:**
-- ✅ CLI command: `npx blackshield scan-env`
+- ✅ CLI command: `npx @cosmstack/blackshield scan-env`
 - ✅ ESLint rule: `@cosmstack/blackshield/no-public-sensitive-env`
 - ✅ Build-time validation via Next.js/Vite plugins
 - ✅ Manual audit: `envAudit()` function
@@ -164,7 +164,7 @@ Prevent accidental exposure of sensitive data through `NEXT_PUBLIC_*` variables.
 
 ```bash
 # Scan your project for sensitive variables
-npx blackshield scan-env
+npx @cosmstack/blackshield scan-env
 ```
 
 ```typescript
@@ -449,36 +449,36 @@ export default defineConfig({
 
 ```bash
 # Comprehensive security analysis
-npx blackshield check
+npx @cosmstack/blackshield check
 
 # Analyze specific directory
-npx blackshield check --path ./src
+npx @cosmstack/blackshield check --path ./src
 
 # Output as JSON
-npx blackshield check --format json
+npx @cosmstack/blackshield check --format json
 
 # Use custom config
-npx blackshield check --config ./custom-config.json
+npx @cosmstack/blackshield check --config ./custom-config.json
 ```
 
 ### Environment Scanning
 
 ```bash
 # Scan for sensitive environment variables
-npx blackshield scan-env
+npx @cosmstack/blackshield scan-env
 
 # Scan specific directory
-npx blackshield scan-env --path ./
+npx @cosmstack/blackshield scan-env --path ./
 ```
 
 ### Configuration
 
 ```bash
 # Initialize configuration files
-npx blackshield init
+npx @cosmstack/blackshield init
 
 # Force overwrite existing config
-npx blackshield init --force
+npx @cosmstack/blackshield init --force
 ```
 
 ## ⚙️ Configuration
