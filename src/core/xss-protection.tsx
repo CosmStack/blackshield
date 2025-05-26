@@ -1,4 +1,4 @@
-import { XSS_DANGEROUS_ATTRIBUTES, XSS_DANGEROUS_TAGS } from '../config/defaults'
+import DOMPurify from 'isomorphic-dompurify'
 import type { XSSProtectionResult } from '../types'
 
 export function sanitizeHTML(
@@ -26,39 +26,64 @@ export function sanitizeHTML(
     }
   }
 
-  // Remove dangerous tags
-  const allowedTags = options.allowedTags || []
-  for (const tag of XSS_DANGEROUS_TAGS) {
-    if (!allowedTags.includes(tag)) {
-      const tagRegex = new RegExp(`<${tag}[^>]*>.*?</${tag}>`, 'gi')
-      const selfClosingRegex = new RegExp(`<${tag}[^>]*/>`, 'gi')
+  // Configure DOMPurify
+  const config: Record<string, unknown> = {}
 
-      if (tagRegex.test(sanitized) || selfClosingRegex.test(sanitized)) {
-        sanitized = sanitized.replace(tagRegex, '')
-        sanitized = sanitized.replace(selfClosingRegex, '')
-        removedTags.push(tag)
-        wasModified = true
-      }
-    }
+  if (options.allowedTags) {
+    config.ALLOWED_TAGS = options.allowedTags
   }
 
-  // Remove dangerous attributes
-  const allowedAttributes = options.allowedAttributes || []
-  for (const attr of XSS_DANGEROUS_ATTRIBUTES) {
-    if (!allowedAttributes.includes(attr)) {
-      const attrRegex = new RegExp(`\\s${attr}\\s*=\\s*["'][^"']*["']`, 'gi')
-      if (attrRegex.test(sanitized)) {
-        sanitized = sanitized.replace(attrRegex, '')
-        wasModified = true
-        warnings.push(`Removed dangerous attribute: ${attr}`)
+  if (options.allowedAttributes) {
+    config.ALLOWED_ATTR = options.allowedAttributes
+  }
+
+  // Store original content to compare
+  const originalContent = sanitized
+
+  // Sanitize with DOMPurify and convert to string
+  const purifiedResult = DOMPurify.sanitize(sanitized, config)
+  const purified = String(purifiedResult) // Convert TrustedHTML to string
+
+  // Check if content was modified
+  if (purified !== originalContent) {
+    wasModified = true
+
+    // Try to detect what was removed (basic detection)
+    const originalTags = originalContent.match(/<(\w+)[^>]*>/g) || []
+    const purifiedTags = purified.match(/<(\w+)[^>]*>/g) || []
+
+    const originalTagNames = originalTags
+      .map((tag) => tag.match(/<(\w+)/)?.[1])
+      .filter(Boolean) as string[]
+    const purifiedTagNames = purifiedTags
+      .map((tag) => tag.match(/<(\w+)/)?.[1])
+      .filter(Boolean) as string[]
+
+    const removed = originalTagNames.filter((tag) => !purifiedTagNames.includes(tag))
+    removedTags.push(...removed)
+
+    if (removed.length > 0) {
+      warnings.push(`Removed potentially dangerous tags: ${removed.join(', ')}`)
+    }
+
+    // Check for script content
+    if (originalContent.includes('<script') && !purified.includes('<script')) {
+      warnings.push('Removed script tags')
+    }
+
+    // Check for event handlers
+    const eventHandlers = ['onclick', 'onload', 'onerror', 'onmouseover']
+    for (const handler of eventHandlers) {
+      if (originalContent.includes(handler) && !purified.includes(handler)) {
+        warnings.push(`Removed ${handler} event handler`)
       }
     }
   }
 
   return {
-    sanitized,
+    sanitized: purified,
     wasModified,
-    removedTags,
+    removedTags: [...new Set(removedTags)], // Remove duplicates
     warnings,
   }
 }
@@ -81,15 +106,36 @@ export function SafeHTML({
   html,
   tag = 'div',
   className,
+  allowedTags,
+  allowedAttributes,
   ...props
 }: {
   html: string
   tag?: keyof JSX.IntrinsicElements
   className?: string
+  allowedTags?: string[]
+  allowedAttributes?: string[]
   [key: string]: unknown
 }) {
+  const sanitizedOptions = {
+    allowedTags,
+    allowedAttributes,
+  }
+
   const safeHTML = createSafeHTML(html)
   const Tag = tag as keyof JSX.IntrinsicElements
 
   return <Tag className={className} dangerouslySetInnerHTML={safeHTML} {...props} />
+}
+
+// Hook for sanitized HTML
+export function useSanitizedHTML(
+  html: string,
+  options?: {
+    allowedTags?: string[]
+    allowedAttributes?: string[]
+    customRules?: Record<string, (input: string) => string>
+  },
+): XSSProtectionResult {
+  return sanitizeHTML(html, options)
 }
