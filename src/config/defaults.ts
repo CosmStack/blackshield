@@ -14,6 +14,12 @@ export const DEFAULT_CONFIG: Required<BlackshieldConfig> = {
     validateServerProps: true,
     customValidators: {},
   },
+  csrfProtection: {
+    enabled: false,
+    tokenHeader: 'x-csrf-token',
+    tokenCookie: 'csrf-token',
+    tokenExpiry: 3600,
+  },
 }
 
 export const DANGEROUS_ENV_PATTERNS = [
