@@ -1,31 +1,55 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig([
-  // Main package
+  // Main library
   {
     entry: ['src/index.ts'],
     format: ['cjs', 'esm'],
     dts: true,
     clean: true,
-    external: ['react', 'next', 'zod'],
-    treeshake: true,
+    external: ['react', 'next', 'zod', 'isomorphic-dompurify'],
   },
   // Server utilities
   {
     entry: ['src/server/index.ts'],
+    outDir: 'dist/server',
     format: ['cjs', 'esm'],
     dts: true,
-    outDir: 'dist/server',
     external: ['react', 'next', 'zod', 'jose'],
-    treeshake: true,
   },
-  // ESLint rules
+  // ESLint plugin
   {
     entry: ['src/rules/index.ts'],
+    outDir: 'dist/rules',
     format: ['cjs', 'esm'],
     dts: true,
-    outDir: 'dist/rules',
     external: ['@typescript-eslint/utils'],
-    treeshake: true,
   },
-]) 
+  // CLI
+  {
+    entry: ['src/cli/index.ts'],
+    outDir: 'dist/cli',
+    format: ['esm'],
+    dts: true,
+    external: ['commander', 'glob'],
+    banner: {
+      js: '#!/usr/bin/env node',
+    },
+  },
+  // Next.js plugin
+  {
+    entry: ['src/build/next-plugin.ts'],
+    outDir: 'dist/build',
+    format: ['cjs', 'esm'],
+    dts: true,
+    external: ['next'],
+  },
+  // Vite plugin
+  {
+    entry: ['src/build/vite-plugin.ts'],
+    outDir: 'dist/build',
+    format: ['cjs', 'esm'],
+    dts: true,
+    external: ['vite'],
+  },
+])
