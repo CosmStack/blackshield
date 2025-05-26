@@ -7,10 +7,6 @@ export { sanitizeHTML, createSafeHTML, SafeHTML, useSanitizedHTML } from './core
 export { validateEnvironmentVariables, createEnvValidator } from './core/env-validator'
 export { envAudit, scanEnvFiles } from './core/env-audit'
 
-// Build-time plugins
-export { withBlackshield } from './build/next-plugin'
-export { blackshieldVite } from './build/vite-plugin'
-
 // Configuration
 export { DEFAULT_CONFIG } from './config/defaults'
 
