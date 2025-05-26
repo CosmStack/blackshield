@@ -182,5 +182,5 @@ if (totalImplemented === totalFeatures) {
 console.log('\n🚀 Next Steps:')
 console.log('1. Run: npm run test:build')
 console.log('2. Fix any failing tests')
-console.log('3. Test CLI: npx blackshield --version')
+console.log('3. Test CLI: npx @cosmstack/blackshield --version')
 console.log('4. Test in a real Next.js project')

@@ -52,7 +52,7 @@ export async function initializeConfig(force = false) {
     console.log('\nNext steps:')
     console.log('1. Review and customize .blackshieldrc.json')
     console.log('2. Merge .eslintrc.blackshield.json with your existing ESLint config')
-    console.log('3. Run "npx blackshield check" to analyze your project')
+    console.log('3. Run "npx @cosmstack/blackshield check" to analyze your project')
   } catch (error) {
     console.error('❌ Failed to initialize configuration:', error)
     process.exit(1)
