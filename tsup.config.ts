@@ -36,12 +36,20 @@ export default defineConfig([
       js: '#!/usr/bin/env node',
     },
   },
-  // Build plugins
+  // Next.js plugin
   {
-    entry: ['src/build/next-plugin.ts', 'src/build/vite-plugin.ts'],
+    entry: ['src/build/next-plugin.ts'],
     outDir: 'dist/build',
     format: ['cjs', 'esm'],
     dts: true,
-    external: ['next', 'vite'],
+    external: ['next'],
+  },
+  // Vite plugin
+  {
+    entry: ['src/build/vite-plugin.ts'],
+    outDir: 'dist/build',
+    format: ['cjs', 'esm'],
+    dts: true,
+    external: ['vite'],
   },
 ])
