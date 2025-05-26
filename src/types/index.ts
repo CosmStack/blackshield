@@ -25,6 +25,17 @@ export interface BlackshieldConfig {
     /** Custom prop validators */
     customValidators?: Record<string, z.ZodSchema>
   }
+  /** CSRF protection settings */
+  csrfProtection?: {
+    /** Enable CSRF protection */
+    enabled?: boolean
+    /** Custom token header name */
+    tokenHeader?: string
+    /** Custom token cookie name */
+    tokenCookie?: string
+    /** Token expiry time in seconds */
+    tokenExpiry?: number
+  }
 }
 
 // User and authentication types
@@ -70,6 +81,35 @@ export interface EnvValidationResult {
   exposedVars: string[]
 }
 
+// Environment audit types
+export interface EnvAuditResult {
+  isValid: boolean
+  sensitiveVars: Array<{
+    name: string
+    file: string
+    line: number
+    severity: 'error' | 'warning'
+    suggestion: string
+  }>
+  summary: {
+    totalVars: number
+    sensitiveCount: number
+    filesScanned: string[]
+  }
+}
+
+// CSRF protection types
+export interface CsrfToken {
+  token: string
+  expiresAt: number
+}
+
+export interface CsrfConfig {
+  tokenHeader?: string
+  tokenCookie?: string
+  tokenExpiry?: number
+}
+
 // XSS protection types
 export interface XSSProtectionResult {
   sanitized: string
@@ -80,7 +120,12 @@ export interface XSSProtectionResult {
 
 // Analysis types for static checking
 export interface SecurityIssue {
-  type: 'env-exposure' | 'xss-vulnerability' | 'boundary-violation'
+  type:
+    | 'env-exposure'
+    | 'xss-vulnerability'
+    | 'boundary-violation'
+    | 'csrf-vulnerability'
+    | 'env-leak'
   severity: 'error' | 'warning' | 'info'
   message: string
   file: string
@@ -90,10 +135,14 @@ export interface SecurityIssue {
 }
 
 export interface AnalysisResult {
+  projectPath: string
+  timestamp: string
   issues: SecurityIssue[]
   summary: {
+    total: number
     errors: number
     warnings: number
     info: number
   }
+  config: BlackshieldConfig
 }
