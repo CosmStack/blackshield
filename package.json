@@ -48,7 +48,7 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "release": "./scripts/release.sh",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "keywords": [
     "security",
