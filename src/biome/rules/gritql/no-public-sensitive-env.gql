@@ -1,0 +1,33 @@
+/*
+ * GritQL Rule: no-public-sensitive-env
+ * Prevents access to sensitive environment variables exposed through NEXT_PUBLIC_
+ * 
+ * Usage in biome.json:
+ * {
+ *   "linter": {
+ *     "rules": {
+ *       "nursery": {
+ *         "noPublicSensitiveEnv": "error"
+ *       }
+ *     }
+ *   }
+ * }
+ */
+
+// Pattern to match process.env.NEXT_PUBLIC_* with sensitive keywords
+pattern sensitive_public_env() {
+  member_expression($object, $property) where {
+    $object <: member_expression(identifier(name="process"), identifier(name="env")),
+    $property <: identifier(name=$var_name),
+    $var_name <: r"NEXT_PUBLIC_.*(?:SECRET|KEY|TOKEN|PASSWORD|PRIVATE|API_SECRET|DATABASE|DB_|MONGO|REDIS|JWT|AUTH|STRIPE_SECRET|PAYPAL|WEBHOOK|ENCRYPTION|HASH|SALT).*"i
+  }
+}
+
+// Main rule
+language js
+
+or {
+  sensitive_public_env() => {
+    error($"Accessing potentially sensitive environment variable that is exposed to client: $var_name")
+  }
+} 

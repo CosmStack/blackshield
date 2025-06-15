@@ -52,4 +52,12 @@ export default defineConfig([
     dts: true,
     external: ['vite'],
   },
+  // Biome plugin
+  {
+    entry: ['src/biome/index.ts'],
+    outDir: 'dist/biome',
+    format: ['cjs', 'esm'],
+    dts: true,
+    external: [],
+  },
 ])

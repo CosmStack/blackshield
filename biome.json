@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", "dist", "build", "*.d.ts", "examples", "scripts"]
+    "ignore": ["node_modules", "dist", "build", "*.d.ts", "examples", "scripts", "**/*.gql"]
   },
   "formatter": {
     "enabled": true,

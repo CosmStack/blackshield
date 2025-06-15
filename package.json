@@ -30,6 +30,11 @@
       "types": "./dist/build/vite-plugin.d.ts",
       "import": "./dist/build/vite-plugin.js",
       "require": "./dist/build/vite-plugin.cjs"
+    },
+    "./biome-plugin": {
+      "types": "./dist/biome/index.d.ts",
+      "import": "./dist/biome/index.js",
+      "require": "./dist/biome/index.cjs"
     }
   },
   "files": ["dist", "README.md"],
@@ -48,7 +53,9 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "release": "./scripts/release.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:biome": "vitest run src/biome/__tests__",
+    "test:biome:watch": "vitest src/biome/__tests__"
   },
   "keywords": [
     "security",

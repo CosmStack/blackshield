@@ -1,0 +1,33 @@
+/*
+ * GritQL Rule: no-unsafe-html
+ * Prevents unsafe HTML injection vulnerabilities
+ * 
+ * Usage in biome.json:
+ * {
+ *   "linter": {
+ *     "rules": {
+ *       "nursery": {
+ *         "noUnsafeHtml": "error"
+ *       }
+ *     }
+ *   }
+ * }
+ */
+
+language js
+
+or {
+  // Match dangerouslySetInnerHTML JSX attribute
+  jsx_attribute($name, $value) where {
+    $name <: jsx_identifier(name="dangerouslySetInnerHTML")
+  } => {
+    error("Using dangerouslySetInnerHTML without sanitization can lead to XSS vulnerabilities. Use SafeHTML component from @cosmstack/blackshield instead.")
+  },
+  
+  // Match direct innerHTML assignment
+  assignment_expression($left, $right) where {
+    $left <: member_expression($object, identifier(name="innerHTML"))
+  } => {
+    error("Direct innerHTML assignment can lead to XSS vulnerabilities. Use SafeHTML component or sanitizeHTML function from @cosmstack/blackshield.")
+  }
+} 

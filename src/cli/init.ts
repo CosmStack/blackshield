@@ -24,9 +24,27 @@ const ESLINT_CONFIG = {
   },
 }
 
+const BIOME_CONFIG = {
+  linter: {
+    enabled: true,
+    rules: {
+      recommended: true,
+      security: {
+        noDangerouslySetInnerHtml: 'off', // We have our own version
+      },
+      // Future: Enable when Biome plugin API is ready
+      // blackshield: {
+      //   noPublicSensitiveEnv: 'error',
+      //   noUnsafeHtml: 'error',
+      // },
+    },
+  },
+}
+
 export async function initializeConfig(force = false) {
   const configPath = '.blackshieldrc.json'
   const eslintPath = '.eslintrc.blackshield.json'
+  const biomePath = 'biome.blackshield.json'
 
   try {
     // Check if config already exists
@@ -48,11 +66,16 @@ export async function initializeConfig(force = false) {
     await fs.writeFile(eslintPath, JSON.stringify(ESLINT_CONFIG, null, 2), 'utf-8')
     console.log('✅ Created .eslintrc.blackshield.json (example ESLint config)')
 
+    // Write Biome config example
+    await fs.writeFile(biomePath, JSON.stringify(BIOME_CONFIG, null, 2), 'utf-8')
+    console.log('✅ Created biome.blackshield.json (example Biome config)')
+
     console.log('\n🛡️  Blackshield initialized successfully!')
     console.log('\nNext steps:')
     console.log('1. Review and customize .blackshieldrc.json')
     console.log('2. Merge .eslintrc.blackshield.json with your existing ESLint config')
-    console.log('3. Run "npx @cosmstack/blackshield check" to analyze your project')
+    console.log('3. Merge biome.blackshield.json with your existing biome.json config')
+    console.log('4. Run "npx @cosmstack/blackshield check" to analyze your project')
   } catch (error) {
     console.error('❌ Failed to initialize configuration:', error)
     process.exit(1)

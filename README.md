@@ -624,6 +624,16 @@ import { blackshieldVite } from '@cosmstack/blackshield/build/vite'
 }
 ```
 
+### Biome Plugin (Beta)
+
+```json
+{
+  "plugins": ["@cosmstack/blackshield/biome-plugin"]
+}
+```
+
+> **Note**: Biome plugin support is currently in beta. See our [Biome setup guide](examples/biome-setup.md) for current implementation details.
+
 ## 🔍 TypeScript Support
 
 Full TypeScript support with comprehensive type definitions:
