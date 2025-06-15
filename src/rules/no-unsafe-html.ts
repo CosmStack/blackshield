@@ -10,7 +10,6 @@ export const noUnsafeHtml = createRule({
     type: 'problem',
     docs: {
       description: 'Prevent unsafe HTML injection vulnerabilities',
-      recommended: 'recommended',
     },
     fixable: 'code',
     schema: [],

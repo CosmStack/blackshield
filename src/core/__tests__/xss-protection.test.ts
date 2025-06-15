@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createSafeHTML, sanitizeHTML, useSanitizedHTML } from '../xss-protection'
 
 describe('sanitizeHTML', () => {
@@ -42,6 +42,18 @@ describe('sanitizeHTML', () => {
     expect(result.sanitized).toContain('More content') // Content should remain even if tag is removed
   })
 
+  it('should respect allowed attributes configuration', () => {
+    const input = '<div id="safe" class="danger" onclick="alert(1)">Content</div>'
+    const result = sanitizeHTML(input, {
+      allowedAttributes: ['id'], // Only allow id attribute
+    })
+
+    expect(result.sanitized).toContain('id="safe"')
+    expect(result.sanitized).not.toContain('class="danger"')
+    expect(result.sanitized).not.toContain('onclick')
+    expect(result.wasModified).toBe(true)
+  })
+
   it('should apply custom rules', () => {
     const input = 'Hello WORLD'
     const result = sanitizeHTML(input, {
@@ -55,12 +67,50 @@ describe('sanitizeHTML', () => {
     expect(result.warnings).toContain('Applied custom rule: lowercase')
   })
 
+  it('should apply multiple custom rules in order', () => {
+    const input = 'Hello WORLD'
+    const result = sanitizeHTML(input, {
+      customRules: {
+        lowercase: (text) => text.toLowerCase(),
+        addPrefix: (text) => `PREFIX: ${text}`,
+      },
+    })
+
+    expect(result.sanitized).toBe('PREFIX: hello world')
+    expect(result.wasModified).toBe(true)
+    expect(result.warnings).toContain('Applied custom rule: lowercase')
+    expect(result.warnings).toContain('Applied custom rule: addPrefix')
+  })
+
   it('should handle multiple dangerous elements', () => {
     const input = '<script>alert(1)</script><iframe src="evil.com"></iframe><p>Safe</p>'
     const result = sanitizeHTML(input)
 
     expect(result.sanitized).toBe('<p>Safe</p>')
     expect(result.wasModified).toBe(true)
+  })
+
+  it('should handle complex XSS patterns', () => {
+    const input = `
+      <img src="x" onerror="alert(1)">
+      <a href="javascript:alert(1)">Link</a>
+      <div style="background: url('javascript:alert(1)')">Content</div>
+      <object data="data:text/html,<script>alert(1)</script>"></object>
+    `
+    const result = sanitizeHTML(input)
+
+    expect(result.sanitized).not.toContain('onerror')
+    expect(result.sanitized).not.toContain('data:text/html')
+    expect(result.wasModified).toBe(true)
+    // Note: DOMPurify may not remove all javascript: URLs in CSS, but removes dangerous scripts
+  })
+
+  it('should detect and warn about removed event handlers', () => {
+    const input = '<div onmouseover="alert(1)" onload="alert(2)">Content</div>'
+    const result = sanitizeHTML(input)
+
+    expect(result.warnings.some((w) => w.includes('onmouseover'))).toBe(true)
+    expect(result.warnings.some((w) => w.includes('onload'))).toBe(true)
   })
 
   it('should handle empty input', () => {
@@ -81,6 +131,19 @@ describe('sanitizeHTML', () => {
 })
 
 describe('createSafeHTML', () => {
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>
+  let originalNodeEnv: string | undefined
+
+  beforeEach(() => {
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    originalNodeEnv = process.env.NODE_ENV
+  })
+
+  afterEach(() => {
+    consoleWarnSpy.mockRestore()
+    vi.unstubAllEnvs()
+  })
+
   it('should return object with __html property', () => {
     const input = '<p>Safe content</p>'
     const result = createSafeHTML(input)
@@ -94,6 +157,39 @@ describe('createSafeHTML', () => {
     const result = createSafeHTML(input)
 
     expect(result.__html).toBe('<p>Safe</p>')
+  })
+
+  it('should warn in development mode when content is modified', () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    const input = '<script>alert("xss")</script><p>Safe</p>'
+
+    createSafeHTML(input)
+
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[Blackshield] HTML was sanitized:',
+      expect.objectContaining({
+        removedTags: expect.any(Array),
+        warnings: expect.any(Array),
+      }),
+    )
+  })
+
+  it('should not warn in production mode', () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    const input = '<script>alert("xss")</script><p>Safe</p>'
+
+    createSafeHTML(input)
+
+    expect(consoleWarnSpy).not.toHaveBeenCalled()
+  })
+
+  it('should not warn when content is not modified', () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    const input = '<p>Safe content</p>'
+
+    createSafeHTML(input)
+
+    expect(consoleWarnSpy).not.toHaveBeenCalled()
   })
 })
 
@@ -115,6 +211,24 @@ describe('useSanitizedHTML', () => {
     })
 
     expect(result.sanitized).toBe('hello world')
+    expect(result.wasModified).toBe(true)
+  })
+
+  it('should support all sanitization options', () => {
+    const input =
+      '<div class="test" onclick="alert(1)"><script>alert(1)</script><p>Content</p></div>'
+    const result = useSanitizedHTML(input, {
+      allowedTags: ['div', 'p'],
+      allowedAttributes: ['class'],
+      customRules: {
+        addSuffix: (text) => `${text} [PROCESSED]`,
+      },
+    })
+
+    expect(result.sanitized).toContain('class="test"')
+    expect(result.sanitized).not.toContain('onclick')
+    expect(result.sanitized).not.toContain('script')
+    expect(result.sanitized).toContain('[PROCESSED]')
     expect(result.wasModified).toBe(true)
   })
 })

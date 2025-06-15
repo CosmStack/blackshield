@@ -32,7 +32,6 @@ export const noPublicSensitiveEnv = createRule({
     type: 'problem',
     docs: {
       description: 'Prevent access to sensitive environment variables exposed through NEXT_PUBLIC_',
-      recommended: 'recommended',
     },
     fixable: 'code',
     schema: [
