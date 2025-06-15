@@ -1,4 +1,5 @@
 import DOMPurify from 'isomorphic-dompurify'
+import type { JSX } from 'react'
 import type { XSSProtectionResult } from '../types'
 
 export function sanitizeHTML(
@@ -115,14 +116,21 @@ export function SafeHTML({
   className?: string
   allowedTags?: string[]
   allowedAttributes?: string[]
-  [key: string]: unknown
-}) {
-  const sanitizedOptions = {
+} & Record<string, unknown>) {
+  const sanitizationOptions = {
     allowedTags,
     allowedAttributes,
   }
+  const result = sanitizeHTML(html, sanitizationOptions)
 
-  const safeHTML = createSafeHTML(html)
+  if (process.env.NODE_ENV === 'development' && result.wasModified) {
+    console.warn('[Blackshield] HTML was sanitized:', {
+      removedTags: result.removedTags,
+      warnings: result.warnings,
+    })
+  }
+
+  const safeHTML = { __html: result.sanitized }
   const Tag = tag as keyof JSX.IntrinsicElements
 
   return <Tag className={className} dangerouslySetInnerHTML={safeHTML} {...props} />
